@@ -60,6 +60,10 @@ export class UsersController {
 
     @Post("/signup")
     async createUser(@Body() body: CreateUserDto, @Session() session: any) {
+        const allUsers = await this.usersService.findAll();
+        if (allUsers.length == 0) {
+            throw new NotFoundException("Server in maintenance");
+        }
         const user = await this.authService.signup(body.email, body.password, false);
         session.userId = user.id;
         return user;
