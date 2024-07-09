@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { User } from './users/user.entity';
+import { ReportsModule } from './reports/reports.module';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -31,7 +32,8 @@ const cookieSession = require('cookie-session');
     //   entities: [User, Report],
     //   synchronize: true,
     // }),
-    UsersModule
+    UsersModule,
+    ReportsModule
   ],
   controllers: [AppController],
   providers: [
