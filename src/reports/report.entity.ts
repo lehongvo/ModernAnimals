@@ -3,7 +3,7 @@ import { Column, Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from
 
 @Entity()
 export class Report {
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn('uuid')
     id: number;
 
     @Column({ default: false })

@@ -74,6 +74,6 @@ Nest is [MIT licensed](LICENSE).
 
 ```sh
 nest g module users
-nest g controller users
-Nest g service users
+nest g controller users --no-spec
+Nest g service users --no-spec
 ```
