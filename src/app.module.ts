@@ -8,7 +8,6 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/user.entity';
 import { ReportsModule } from './reports/reports.module';
 import { Report } from './reports/report.entity';
-import { AuthModule } from './auth/auth.module';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -36,7 +35,6 @@ const cookieSession = require('cookie-session');
     // }),
     UsersModule,
     ReportsModule,
-    AuthModule
   ],
   controllers: [AppController],
   providers: [
