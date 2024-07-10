@@ -3,7 +3,7 @@ import { ReportsService } from './reports.service';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { CurrentUser } from 'src/users/decorators/current-user.decorator';
 import { User } from 'src/users/user.entity';
-import { AuthGuard } from 'src/guards/auth.guard';
+import { AuthGuardCLT } from 'src/guards/auth.guard';
 import { ReportDto } from './dtos/reportDto.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 
@@ -12,7 +12,7 @@ export class ReportsController {
     constructor(private reportsService: ReportsService) { }
 
     @Post()
-    @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardCLT)
     @Serialize(ReportDto)
     create(
         @Body() body: CreateReportDto,
@@ -22,7 +22,7 @@ export class ReportsController {
     }
 
     @Patch('/:id')
-    @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardCLT)
     changeApproval(
         @Param('id') id: string,
         @Body() body: { approved: boolean },

@@ -8,5 +8,5 @@ export class UserDto {
   email: string;
 
   @Expose()
-  admin: boolean;
+  accessToken: string;
 }

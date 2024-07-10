@@ -1,25 +1,25 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Session, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Req, Session, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, CreateUserDtoForAdmin } from './dtos/create-user.dto';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { Serialize } from "../interceptors/serialize.interceptor";
 import { UserDto } from './dtos/user.dto';
-import { AuthGuard } from 'src/guards/auth.guard';
+import { AuthGuardCLT, JwtAuthGuard } from 'src/guards/auth.guard';
 import { AuthService } from './auth.service';
-import { randomBytes, scrypt as _scrypt } from 'crypto';
-import { promisify } from 'util';
-const scrypt = promisify(_scrypt);
+import { JwtService } from '@nestjs/jwt';
+import { CreateJwtDtoPayloads } from './dtos/create-jwt.dto';
 
 @Controller('users')
 @Serialize(UserDto)
 export class UsersController {
     constructor(
         private usersService: UsersService,
-        private authService: AuthService
+        private authService: AuthService,
+        private jwtService: JwtService
     ) { }
 
     @Get("/whoami")
-    @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardCLT)
     async whoAmI(@CurrentUser() user: any) {
         if (!user) {
             throw new NotFoundException("User not found");
@@ -71,13 +71,17 @@ export class UsersController {
 
     @Post("/signin")
     async signin(@Body() body: CreateUserDto, @Session() session: any) {
-        const user = await this.authService.signin(body.email, body.password);
+        let user = await this.authService.signin(body.email, body.password);
+        const payload: CreateJwtDtoPayloads = {
+            email: user.email
+        }
+        const accessToken = this.jwtService.sign(payload);
         session.userId = user.id;
-        return user;
+        return { ...user, accessToken };
     }
 
     @Get('')
-    @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardCLT)
     async findAllUsers(@Session() session: any) {
         const userCookieData = await this.usersService.findOne(session.userId);
         if (!userCookieData.admin) {
@@ -88,7 +92,7 @@ export class UsersController {
 
 
     @Delete()
-    @UseGuards(AuthGuard)
+    @UseGuards(AuthGuardCLT)
     async removeUser(
         @Body() body: CreateUserDto,
         @Session() session: any
@@ -115,5 +119,10 @@ export class UsersController {
     @Patch('/:id')
     async updateUser(@Param('id') id: number, @Body() body: Partial<CreateUserDto>) {
         return this.usersService.update(id, body);
+    }
+
+    @Get("/test")
+    async test() {
+        console.log("req.user")
     }
 }
