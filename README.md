@@ -77,3 +77,11 @@ nest g module users
 nest g controller users --no-spec
 Nest g service users --no-spec
 ```
+
+## Apply heroku
+
+```
+sudo yarn global add heroku
+heroku --version
+
+```
