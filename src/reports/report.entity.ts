@@ -1,9 +1,10 @@
+import { IsOptional } from "class-validator";
 import { User } from "src/users/user.entity";
 import { Column, Entity, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Report {
-    @PrimaryGeneratedColumn('uuid')
+    @PrimaryGeneratedColumn()
     id: number;
 
     @Column({ default: false })
@@ -32,6 +33,10 @@ export class Report {
 
     @Column()
     hash: string
+
+    @Column()
+    @IsOptional()
+    userId: number
 
     @ManyToOne(() => User, (user) => user.reports)
     user: User

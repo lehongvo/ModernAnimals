@@ -5,10 +5,13 @@ import { CreateReportDto } from './dtos/create-report.dto';
 import { User } from 'src/users/user.entity';
 import { Report } from './report.entity';
 import * as crypto from 'crypto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ReportsService {
-    constructor(@InjectRepository(Report) private repo: Repository<Report>) { }
+    constructor(
+        @InjectRepository(Report) private repo: Repository<Report>,
+    ) { }
 
     private generateReportHash(reportData: CreateReportDto): string {
         const dataString = JSON.stringify(reportData);
@@ -37,6 +40,11 @@ export class ReportsService {
         }
         report.approved = approved;
         return this.repo.save(report);
+    }
+
+    async getAllReports() {
+        const allData = await this.repo.find();
+        return allData;
     }
 
     private async getAllHashes(): Promise<string[]> {

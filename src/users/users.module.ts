@@ -22,7 +22,7 @@ import { JwtStrategy } from './jwt.strategy';
   ],
   controllers: [UsersController],
   providers: [UsersService, AuthService, JwtStrategy],
-  exports: [JwtStrategy, PassportModule]
+  exports: [JwtStrategy, PassportModule, UsersService]
 })
 export class UsersModule {
   configure(consumer: MiddlewareConsumer) {
