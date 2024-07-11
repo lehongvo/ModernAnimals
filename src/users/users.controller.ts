@@ -20,6 +20,7 @@ export class UsersController {
 
     @Get("/whoami")
     @UseGuards(AuthGuardCLT)
+    @UseGuards(JwtAuthGuard)
     async whoAmI(@CurrentUser() user: any) {
         if (!user) {
             throw new NotFoundException("User not found");
@@ -28,6 +29,7 @@ export class UsersController {
     }
 
     @Post("/signout")
+    @UseGuards(JwtAuthGuard)
     async signOut(@Session() session: any) {
         if (!session.userId) {
             throw new NotFoundException("User not found");
@@ -80,8 +82,9 @@ export class UsersController {
         return { ...user, accessToken };
     }
 
-    @Get('')
+    @Get()
     @UseGuards(AuthGuardCLT)
+    @UseGuards(JwtAuthGuard)
     async findAllUsers(@Session() session: any) {
         const userCookieData = await this.usersService.findOne(session.userId);
         if (!userCookieData.admin) {
@@ -93,6 +96,7 @@ export class UsersController {
 
     @Delete()
     @UseGuards(AuthGuardCLT)
+    @UseGuards(JwtAuthGuard)
     async removeUser(
         @Body() body: CreateUserDto,
         @Session() session: any
@@ -117,12 +121,8 @@ export class UsersController {
     }
 
     @Patch('/:id')
+    @UseGuards(JwtAuthGuard)
     async updateUser(@Param('id') id: number, @Body() body: Partial<CreateUserDto>) {
         return this.usersService.update(id, body);
-    }
-
-    @Get("/test")
-    async test() {
-        console.log("req.user")
     }
 }

@@ -3,7 +3,7 @@ import { ReportsService } from './reports.service';
 import { CreateReportDto } from './dtos/create-report.dto';
 import { CurrentUser } from 'src/users/decorators/current-user.decorator';
 import { User } from 'src/users/user.entity';
-import { AuthGuardCLT } from 'src/guards/auth.guard';
+import { AuthGuardCLT, JwtAuthGuard } from 'src/guards/auth.guard';
 import { ReportDto } from './dtos/reportDto.dto';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 
@@ -13,6 +13,7 @@ export class ReportsController {
 
     @Post()
     @UseGuards(AuthGuardCLT)
+    @UseGuards(JwtAuthGuard)
     @Serialize(ReportDto)
     create(
         @Body() body: CreateReportDto,
@@ -23,6 +24,7 @@ export class ReportsController {
 
     @Patch('/:id')
     @UseGuards(AuthGuardCLT)
+    @UseGuards(JwtAuthGuard)
     changeApproval(
         @Param('id') id: string,
         @Body() body: { approved: boolean },
