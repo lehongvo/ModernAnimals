@@ -8,10 +8,12 @@ import { AuthGuardCLT, JwtAuthGuard } from 'src/guards/auth.guard';
 import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateJwtDtoPayloads } from './dtos/create-jwt.dto';
+import { Logger } from '@nestjs/common';
 
 @Controller('users')
 @Serialize(UserDto)
 export class UsersController {
+    private logger = new Logger('UsersController');
     constructor(
         private usersService: UsersService,
         private authService: AuthService,
@@ -22,6 +24,7 @@ export class UsersController {
     @UseGuards(AuthGuardCLT)
     @UseGuards(JwtAuthGuard)
     async whoAmI(@CurrentUser() user: any) {
+        this.logger.verbose(`User ${user.email} is authenticated`);
         if (!user) {
             throw new NotFoundException("User not found");
         }
@@ -31,6 +34,7 @@ export class UsersController {
     @Post("/signout")
     @UseGuards(JwtAuthGuard)
     async signOut(@Session() session: any) {
+        this.logger.verbose(`User ${session.userId} is signed out`);
         if (!session.userId) {
             throw new NotFoundException("User not found");
         }
@@ -40,6 +44,7 @@ export class UsersController {
 
     @Post("/signupWithAdmin")
     async createNewAdmin(@Body() body: CreateUserDtoForAdmin, @Session() session: any) {
+        this.logger.verbose(`User ${body.email} is signed up`);
         const allUsers = await this.usersService.findAll();
         if (allUsers.length > 0) {
             console.log("session.userId", session.userId)
@@ -62,6 +67,7 @@ export class UsersController {
 
     @Post("/signup")
     async createUser(@Body() body: CreateUserDto, @Session() session: any) {
+        this.logger.verbose(`User ${body.email} is signed up`);
         const allUsers = await this.usersService.findAll();
         if (allUsers.length == 0) {
             throw new NotFoundException("Server in maintenance");
@@ -73,6 +79,7 @@ export class UsersController {
 
     @Post("/signin")
     async signin(@Body() body: CreateUserDto, @Session() session: any) {
+        this.logger.verbose(`User ${body.email} is signed in`);
         let user = await this.authService.signin(body.email, body.password);
         const payload: CreateJwtDtoPayloads = {
             email: user.email
@@ -86,13 +93,13 @@ export class UsersController {
     @UseGuards(AuthGuardCLT)
     @UseGuards(JwtAuthGuard)
     async findAllUsers(@Session() session: any) {
+        this.logger.verbose(`User ${session.userId} is getting all users`);
         const userCookieData = await this.usersService.findOne(session.userId);
         if (!userCookieData.admin) {
             throw new NotFoundException("Only admin");
         }
         return this.usersService.findAll();
     }
-
 
     @Delete()
     @UseGuards(AuthGuardCLT)
@@ -101,6 +108,7 @@ export class UsersController {
         @Body() body: CreateUserDto,
         @Session() session: any
     ) {
+        this.logger.verbose(`User ${session.userId} is deleting user ${body.email}`);
         const [user] = await this.usersService.find(body.email);
         if (!session.userId || !user) {
             throw new NotFoundException("User not found");
@@ -123,6 +131,7 @@ export class UsersController {
     @Patch('/:id')
     @UseGuards(JwtAuthGuard)
     async updateUser(@Param('id') id: number, @Body() body: Partial<CreateUserDto>) {
+        this.logger.verbose(`User ${id} is updating user ${body.email}`);
         return this.usersService.update(id, body);
     }
 }
