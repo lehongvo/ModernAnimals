@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { User } from './users/user.entity';
 import { ReportsModule } from './reports/reports.module';
 import { Report } from './reports/report.entity';
+import { configValidationSchema } from './config.schema';
 const cookieSession = require('cookie-session');
 
 @Module({
@@ -15,10 +16,12 @@ const cookieSession = require('cookie-session');
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`,
+      validationSchema: configValidationSchema,
     }),
     TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
+      useFactory: async (config: ConfigService) => {
         return {
           type: 'sqlite',
           database: config.get<string>('DB_NAME'),
@@ -27,12 +30,6 @@ const cookieSession = require('cookie-session');
         };
       },
     }),
-    // TypeOrmModule.forRoot({
-    //   type: 'sqlite',
-    //   database: 'db.sqlite',
-    //   entities: [User, Report],
-    //   synchronize: true,
-    // }),
     UsersModule,
     ReportsModule,
   ],
@@ -48,11 +45,12 @@ const cookieSession = require('cookie-session');
   ],
 })
 export class AppModule {
+  constructor(private configService: ConfigService) { }
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(
         cookieSession({
-          keys: ['asdfasfd'],
+          keys: [this.configService.get<string>('COOKIE_SESSION')],
         }),
       )
       .forRoutes('*');
